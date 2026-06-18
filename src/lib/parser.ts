@@ -1,13 +1,24 @@
 import type { KeybrLesson, ProcessedLesson, KeyStats, ParserResult } from "./types";
 
 /**
- * Parse a keybr.com export JSON string into processed lessons and key stats.
+ * Parse a keybr.com export JSON string into processed lessons and
+ * aggregated per-key statistics.
  *
- * Uses simple `for` loops instead of chained functional methods to avoid
- * unnecessary array allocations on large datasets (20 MB+ exports).
+ * ## Performance
+ * Uses simple `for` loops instead of chained `.map()` / `.reduce()`
+ * calls to minimise array allocations. This matters for exports
+ * exceeding 20 MB / 100 000+ lessons.
  *
- * WPM formula: (length × 12000) / time
- * Accuracy: totalHits / (totalHits + totalMisses) × 100
+ * ## Formulas
+ * - **WPM** = (length × 12000) / time \
+ *   (the `speed` field from keybr is a different, incompatible unit)
+ * - **Accuracy** = totalHits / (totalHits + totalMisses) × 100
+ *
+ * ## Returns
+ * `ParserResult` containing:
+ * - `lessons` — array of `ProcessedLesson` (sorted by upload order)
+ * - `keyStats` — per-key aggregates sorted by error rate (descending)
+ * - `totalTime` — wall-clock parse duration in ms
  */
 export function parseLessons(raw: string): ParserResult {
   const t0 = performance.now();
@@ -84,9 +95,13 @@ export function parseLessons(raw: string): ParserResult {
 }
 
 /**
- * Simple linear regression (least squares).
- * Returns slope, intercept, and a reusable function.
- * Returns null when fewer than 2 data points exist or denominator is zero.
+ * Simple linear regression (ordinary least squares).
+ *
+ * Given an array of `{ x, y }` points, computes the best-fit line
+ * `y = slope × x + intercept`.
+ *
+ * Returns `null` when fewer than 2 data points exist or when the
+ * denominator (n·Σx² − (Σx)²) is too close to zero.
  */
 export function linearRegression(data: { x: number; y: number }[]) {
   const n = data.length;
@@ -106,8 +121,13 @@ export function linearRegression(data: { x: number; y: number }[]) {
 }
 
 /**
- * Compute averages over the most recent N lessons.
- * Uses a reverse slice and single-pass loop for memory efficiency.
+ * Compute average WPM, accuracy, and total practice time over the
+ * most recent N lessons.
+ *
+ * Uses a reverse-index slice + single-pass loop to avoid copying
+ * the input array.
+ *
+ * Returns `null` when `lessons` is empty.
  */
 export function computeRecentAverages(lessons: ProcessedLesson[], count: number) {
   const start = Math.max(0, lessons.length - count);

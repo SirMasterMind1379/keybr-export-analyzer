@@ -1,3 +1,19 @@
+/**
+ * TypeScript interfaces matching the keybr.com export JSON schema and
+ * the internal processed-data shapes used by the analyzer.
+ *
+ * ## Export format (flat array)
+ * The keybr.com export is a JSON **array** of lesson objects (not
+ * keyed by layout). Each lesson has a `histogram` property that is
+ * also an **array** of per-key entries.
+ *
+ * ## Key fields
+ * - `KeybrLesson.speed` — keybr's internal speed metric; do NOT use
+ *   for WPM. Use the formula `(length × 12000) / time` instead.
+ * - `time` is in milliseconds.
+ * - `timeStamp` is ISO 8601 UTC.
+ */
+
 /** A single key-stat entry in a lesson's histogram array */
 export interface HistogramEntry {
   /** Unicode code point of the key */
@@ -35,9 +51,9 @@ export interface ProcessedLesson {
   length: number;
   time: number;
   errors: number;
-  /** Calculated WPM = (length * 12000) / time */
+  /** Calculated WPM = (length × 12000) / time */
   wpm: number;
-  /** Calculated accuracy % = hits / (hits + misses) * 100 */
+  /** Calculated accuracy % = hits / (hits + misses) × 100 */
   accuracy: number;
   histogram: HistogramEntry[];
 }

@@ -1,6 +1,11 @@
 "use client";
 
-/** Number-of-lessons filter options for charts */
+/**
+ * The available lesson-range filter options.
+ *
+ * - `"all"` — display every lesson in the dataset
+ * - `1000 | 100 | 50 | 20` — show only the last N lessons
+ */
 export type Range = "all" | 1000 | 100 | 50 | 20;
 
 const options: { label: string; value: Range }[] = [
@@ -11,19 +16,25 @@ const options: { label: string; value: Range }[] = [
   { label: "20", value: 20 },
 ];
 
-/** Button group that selects how many recent lessons to display in charts */
+/**
+ * Horizontal button group that controls how many recent lessons are
+ * shown in the charts and summary cards.
+ *
+ * The active button uses the royal-red accent; inactive buttons are
+ * styled with the warm-gray palette.
+ */
 export function RangeSelect({ range, onChange }: { range: Range; onChange: (r: Range) => void }) {
   return (
     <div className="flex items-center gap-1 text-xs">
-      <span className="text-zinc-400 mr-1">Show:</span>
+      <span className="text-warm-gray mr-1">Show:</span>
       {options.map((o) => (
         <button
           key={o.label}
           onClick={() => onChange(o.value)}
-          className={`px-2 py-1 rounded-md transition-colors ${
+          className={`px-2 py-1 transition-colors ${
             range === o.value
-              ? "bg-zinc-200 text-zinc-900 dark:bg-zinc-700 dark:text-zinc-100"
-              : "text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+              ? "bg-royal-red text-beige"
+              : "text-warm-gray hover:text-warm-brown dark:text-warm-gray-light dark:hover:text-beige"
           }`}
         >
           {o.label}

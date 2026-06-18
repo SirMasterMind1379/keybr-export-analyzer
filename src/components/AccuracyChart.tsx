@@ -9,16 +9,20 @@ import { linearRegression } from "@/lib/parser";
 /**
  * Line chart of accuracy percentage over lesson index.
  *
- * Shows:
- * - Individual accuracy data points (green line, no dots for performance)
- * - Linear regression trend line (amber dashed) with slope annotation
- * - Average accuracy reference line (gray dashed) with label
- * - Y-axis locked to 80-100% range for readability
+ * Chart elements:
+ * - **Line** — per-lesson accuracy in green (no dots for performance)
+ * - **Trend line** — linear regression in amber dashed, annotated with slope
+ * - **Reference line** — average accuracy in warm-gray dashed
+ * - Y-axis locked to 80–100 % for readability
+ *
+ * Accuracy formula: totalHits / (totalHits + totalMisses) × 100.
  */
 export function AccuracyChart({ lessons }: { lessons: ProcessedLesson[] }) {
   const raw = lessons.map((l, i) => ({ x: i, y: l.accuracy }));
   const trend = linearRegression(raw);
-  const avg = lessons.length > 0 ? Math.round(lessons.reduce((s, l) => s + l.accuracy, 0) / lessons.length * 10) / 10 : 0;
+  const avg = lessons.length > 0
+    ? Math.round(lessons.reduce((s, l) => s + l.accuracy, 0) / lessons.length * 10) / 10
+    : 0;
   const slopeLabel = trend
     ? `${trend.slope >= 0 ? "+" : ""}${(trend.slope * 100).toFixed(2)}%/100 lessons`
     : "";
@@ -29,18 +33,18 @@ export function AccuracyChart({ lessons }: { lessons: ProcessedLesson[] }) {
   }));
 
   return (
-    <div className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-      <h2 className="text-lg font-semibold mb-1">Accuracy Over Time</h2>
-      {slopeLabel && <p className="text-sm text-zinc-500 mb-3">{slopeLabel}</p>}
+    <div className="border border-beige-dark p-4 bg-beige-light dark:bg-[#3D3226] dark:border-[#5A4A3A]">
+      <h2 className="text-lg font-semibold mb-1 text-warm-brown dark:text-beige">Accuracy Over Time</h2>
+      {slopeLabel && <p className="text-sm text-warm-gray mb-3">{slopeLabel}</p>}
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e4e4e7" />
-          <XAxis dataKey="i" tick={false} label={{ value: "Lesson", position: "insideBottom", offset: -5 }} />
-          <YAxis domain={[80, 100]} tick={{ fontSize: 12 }} width={45} label={{ value: "%", angle: -90, position: "insideLeft", style: { fontSize: 12 } }} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#D4C9B4" />
+          <XAxis dataKey="i" tick={false} label={{ value: "Lesson", position: "insideBottom", offset: -5, fill: "#8B7D6B" }} />
+          <YAxis domain={[80, 100]} tick={{ fontSize: 12, fill: "#8B7D6B" }} width={45} label={{ value: "%", angle: -90, position: "insideLeft", style: { fontSize: 12, fill: "#8B7D6B" } }} />
           <Tooltip />
-          <ReferenceLine y={avg} stroke="#a1a1aa" strokeDasharray="4 4" label={{ value: `avg ${avg}%`, position: "right", fontSize: 11, fill: "#a1a1aa" }} />
+          <ReferenceLine y={avg} stroke="#A89A8A" strokeDasharray="4 4" label={{ value: `avg ${avg}%`, position: "right", fontSize: 11, fill: "#A89A8A" }} />
           <Line type="monotone" dataKey="accuracy" stroke="#22c55e" strokeWidth={1.5} dot={false} isAnimationActive={false} />
-          {trend && <Line type="monotone" dataKey="trend" stroke="#f59e0b" strokeWidth={2} strokeDasharray="6 3" dot={false} isAnimationActive={false} />}
+          {trend && <Line type="monotone" dataKey="trend" stroke="#D97706" strokeWidth={2} strokeDasharray="6 3" dot={false} isAnimationActive={false} />}
         </LineChart>
       </ResponsiveContainer>
     </div>

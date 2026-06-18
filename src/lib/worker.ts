@@ -1,13 +1,28 @@
 /**
- * Creates a Blob-backed Web Worker for off-thread JSON parsing.
+ * Factory for a Blob-backed Web Worker that parses keybr.com JSON
+ * exports off the main thread.
  *
- * For large exports (>5 MB) the parser runs in a Web Worker so the
- * main thread stays responsive. The worker code is inlined as a string,
- * wrapped in a Blob, and loaded as a Worker — no separate file needed.
+ * ## Why a Blob worker?
+ * Inlining the parser code as a string → Blob → Worker URL avoids
+ * needing a separate physical file, which keeps the bundler output
+ * simple and avoids cross-origin / CSP issues with `new Worker(...)`.
  *
- * The worker receives the raw JSON string and posts back:
- *   { ok: true, lessons, keyStats }
- *   { ok: false, error }
+ * ## When is this used?
+ * The worker is only instantiated for files larger than 5 MB.
+ * Smaller files are parsed synchronously with `JSON.parse()` on the
+ * main thread (which is measurably faster than the postMessage round
+ * trip).
+ *
+ * ## Message protocol
+ * The worker receives the raw JSON string via `postMessage` and
+ * sends back either:
+ * - `{ ok: true, lessons: ProcessedLesson[], keyStats: KeyStats[] }`
+ * - `{ ok: false, error: string }`
+ *
+ * ## Limitations
+ * - The worker code duplicates `parseLessons()` logic (it cannot
+ *   import modules because `importScripts` in a Blob worker has
+ *   restricted URL resolution). Keep the two implementations in sync.
  */
 export function createParseWorker(): Worker {
   const code = `

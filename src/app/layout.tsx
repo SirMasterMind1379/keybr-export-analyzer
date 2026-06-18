@@ -15,23 +15,22 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "keybr Analyzer",
   description: "Analyze your keybr.com export data with charts and averages",
+  icons: { icon: "/favicon.svg" },
 };
 
 /**
  * Root layout.
  *
- * An inline script in <head> sets the dark class on <html> before React
- * hydrates to avoid a flash of wrong theme. The script reads from
- * localStorage or defaults to dark mode.
+ * Sets up fonts, global CSS, favicon, and the no-flash dark mode script.
+ * The inline script in <head> reads localStorage before React hydrates so
+ * the correct theme class is present on first paint.
  *
- * suppressHydrationWarning on <html> and <body> prevents React warnings
- * caused by browser extensions (e.g. Vimium) that mutate the DOM.
+ * suppressHydrationWarning prevents React warnings from browser-extension
+ * DOM mutations (e.g. Vimium adding classes to <body>).
  */
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
       lang="en"
@@ -45,7 +44,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="min-h-full flex flex-col bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100" suppressHydrationWarning>
+      <body
+        className="min-h-full flex flex-col bg-beige text-warm-brown dark:bg-[#2C2416] dark:text-beige"
+        suppressHydrationWarning
+      >
         {children}
       </body>
     </html>

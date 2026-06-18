@@ -3,11 +3,16 @@
 import { useCallback, useEffect, useState } from "react";
 
 /**
- * Light/dark mode toggle.
+ * Light / dark mode toggle button.
  *
- * Reads initial state from <html> class (set by an inline script in layout.tsx
- * to prevent flash-of-wrong-theme). Toggles the "dark" class on <html> and
- * persists preference to localStorage.
+ * Behaviour:
+ * - Reads the initial theme from <html class="dark"> (set by an inline
+ *   script in layout.tsx to avoid flash-of-wrong-theme on first paint).
+ * - Toggles the "dark" class on <html> and persists the choice to localStorage.
+ * - The moon (☾) / sun (☀) indicator reflects the current mode.
+ *
+ * This component is intentionally small and side-effect-driven so that
+ * it can be rendered anywhere in the component tree without prop-drilling.
  */
 export function ThemeToggle() {
   const [dark, setDark] = useState(false);
@@ -26,7 +31,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggle}
-      className="text-sm text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100 transition-colors"
+      className="text-sm text-warm-gray hover:text-warm-brown dark:text-warm-gray-light dark:hover:text-beige transition-colors"
       aria-label="Toggle dark mode"
     >
       {dark ? "☀" : "☾"}
