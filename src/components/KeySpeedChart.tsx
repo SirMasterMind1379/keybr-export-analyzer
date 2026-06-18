@@ -24,7 +24,8 @@ export function KeySpeedChart({ keyStats }: { keyStats: KeyStats[] }) {
   return (
     <div className="border border-beige-dark p-4 bg-beige-light dark:bg-[#3D3226] dark:border-[#5A4A3A]">
       <h2 className="text-lg font-semibold mb-4 text-warm-brown dark:text-beige">Per-Key Speed</h2>
-      <ResponsiveContainer width="100%" height={300}>
+      <div className="h-[300px] lg:h-[400px]">
+        <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#D4C9B4" />
           <XAxis dataKey="char" tick={{ fontSize: 12, fill: "#8B7D6B" }} />
@@ -33,6 +34,7 @@ export function KeySpeedChart({ keyStats }: { keyStats: KeyStats[] }) {
           <Bar dataKey="wpm" fill="#C41E3A" isAnimationActive={false} />
         </BarChart>
       </ResponsiveContainer>
+      </div>
     </div>
   );
 }

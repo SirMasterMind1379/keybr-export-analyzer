@@ -1,4 +1,4 @@
-import type { KeybrLesson, ProcessedLesson, KeyStats, ParserResult } from "./types";
+import type { KeybrLesson, ProcessedLesson, KeyStats, ParserResult, StreakResult } from "./types";
 
 /**
  * Parse a keybr.com export JSON string into processed lessons and
@@ -150,4 +150,36 @@ export function computeRecentAverages(lessons: ProcessedLesson[], count: number)
     totalChars: sumChars,
     lessonCount: n,
   };
+}
+
+/**
+ * Compute consecutive-day streaks from processed lessons.
+ *
+ * Groups lessons by calendar date (UTC), then walks backward from
+ * the most-recent day counting consecutive days. Returns two streaks:
+ * - `streak` — days with at least one lesson
+ * - `thirtyMinStreak` — days with ≥ 30 minutes (1 800 000 ms) of practice
+ */
+export function computeStreaks(lessons: ProcessedLesson[]): StreakResult {
+  if (lessons.length === 0) return { streak: 0, thirtyMinStreak: 0, active: false };
+  const dayMap = new Map<string, number>();
+  for (let i = 0; i < lessons.length; i++) {
+    const day = lessons[i].timeStamp.slice(0, 10);
+    dayMap.set(day, (dayMap.get(day) || 0) + lessons[i].time);
+  }
+  const days = [...dayMap.keys()].sort();
+  const last = days.length - 1;
+  const today = new Date().toISOString().slice(0, 10);
+  const active = days[last] === today;
+  let streak = 1;
+  let thirtyMinStreak = dayMap.get(days[last])! >= 1_800_000 ? 1 : 0;
+  for (let i = last - 1; i >= 0; i--) {
+    const curr = new Date(days[i] + "T00:00:00Z");
+    const next = new Date(days[i + 1] + "T00:00:00Z");
+    const diff = Math.round((next.getTime() - curr.getTime()) / 86_400_000);
+    if (diff !== 1) break;
+    streak++;
+    if (dayMap.get(days[i])! >= 1_800_000) thirtyMinStreak++;
+  }
+  return { streak, thirtyMinStreak, active };
 }

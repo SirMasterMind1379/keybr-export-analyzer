@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { ProcessedLesson, KeyStats } from "@/lib/types";
-import { parseLessons } from "@/lib/parser";
+import type { ProcessedLesson, KeyStats, StreakResult } from "@/lib/types";
+import { parseLessons, computeStreaks } from "@/lib/parser";
 import { createParseWorker } from "@/lib/worker";
 import { WPMChart } from "./WPMChart";
 import { AccuracyChart } from "./AccuracyChart";
@@ -11,6 +11,7 @@ import { KeyErrorChart } from "./KeyErrorChart";
 import { RecentAverages } from "./RecentAverages";
 import { ThemeToggle } from "./ThemeToggle";
 import { RangeSelect, type Range } from "./RangeSelect";
+import { StreakCard } from "./StreakCard";
 
 type Phase = "upload" | "parsing" | "done";
 
@@ -42,9 +43,11 @@ export function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [parseTime, setParseTime] = useState(0);
   const [totalLessons, setTotalLessons] = useState(0);
+  const [streaks, setStreaks] = useState<StreakResult | null>(null);
   const [range, setRange] = useState<Range>("all");
   const [fileKey, setFileKey] = useState(0);
   const [showGuide, setShowGuide] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
   const workerRef = useRef<Worker | null>(null);
 
   useEffect(() => {
@@ -74,6 +77,7 @@ export function Dashboard() {
             setLessons(msg.lessons);
             setKeyStats(msg.keyStats);
             setTotalLessons(msg.lessons.length);
+            setStreaks({ streak: msg.streak, thirtyMinStreak: msg.thirtyMinStreak, active: msg.active });
             setPhase("done");
           } else {
             setError(msg.error);
@@ -94,6 +98,7 @@ export function Dashboard() {
           setKeyStats(result.keyStats);
           setTotalLessons(result.lessons.length);
           setParseTime(result.totalTime);
+          setStreaks(computeStreaks(result.lessons));
           setPhase("done");
         } catch (e) {
           setError(e instanceof Error ? e.message : "Parse failed");
@@ -113,16 +118,41 @@ export function Dashboard() {
     [lessons, range],
   );
 
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(true);
+  }, []);
+  const handleDragLeave = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+  }, []);
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file && file.name.endsWith(".json")) handleFile(file);
+  }, [handleFile]);
+
   if (phase === "upload" || phase === "parsing") {
     return (
-      <div className="flex flex-1 items-center justify-center p-8 relative">
+      <div
+        className="flex flex-1 items-center justify-center p-8 relative"
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+      >
         <div className="absolute top-4 right-4">
           <ThemeToggle />
         </div>
         <div className="text-center max-w-md">
           {phase === "parsing" ? (
             <div className="space-y-4">
-              <div className="mx-auto w-8 h-8 border-4 border-royal-red border-t-transparent animate-spin" />
+              <div className="flex gap-1 justify-center">
+                <div className="w-3 h-3 bg-royal-red animate-[pulse_1.2s_ease-in-out_infinite]" />
+                <div className="w-3 h-3 bg-royal-red animate-[pulse_1.2s_ease-in-out_0.15s_infinite]" />
+                <div className="w-3 h-3 bg-royal-red animate-[pulse_1.2s_ease-in-out_0.3s_infinite]" />
+                <div className="w-3 h-3 bg-royal-red animate-[pulse_1.2s_ease-in-out_0.45s_infinite]" />
+              </div>
               <p className="text-warm-gray">Parsing export file...</p>
             </div>
           ) : (
@@ -145,6 +175,9 @@ export function Dashboard() {
                   }}
                 />
               </label>
+              <p className={`mt-3 text-xs border border-dashed px-3 py-2 transition-colors ${dragOver ? "border-royal-red text-royal-red" : "border-warm-gray text-warm-gray"}`}>
+                or drag & drop a .json file here
+              </p>
               <button
                 type="button"
                 onClick={() => setShowGuide((v) => !v)}
@@ -172,8 +205,8 @@ export function Dashboard() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-4 sm:p-8 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="max-w-7xl mx-auto p-4 sm:p-8 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
           <h1 className="text-2xl font-bold text-warm-brown dark:text-beige">keybr Analyzer</h1>
           <p className="text-sm text-warm-gray">
@@ -200,6 +233,7 @@ export function Dashboard() {
         </div>
       </div>
 
+      {streaks && <StreakCard streaks={streaks} />}
       <RecentAverages lessons={filteredLessons!} />
       <WPMChart lessons={filteredLessons!} />
       <AccuracyChart lessons={filteredLessons!} />

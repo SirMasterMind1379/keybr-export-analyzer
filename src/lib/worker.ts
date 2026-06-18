@@ -87,7 +87,27 @@ self.onmessage = function(e) {
     }
     keyStats.sort(function(a, b) { return b.errorRate - a.errorRate; });
 
-    self.postMessage({ ok: true, lessons: lessons, keyStats: keyStats });
+    var dayMap = {};
+    for (var i = 0; i < len; i++) {
+      var day = lessons[i].timeStamp.slice(0, 10);
+      dayMap[day] = (dayMap[day] || 0) + lessons[i].time;
+    }
+    var days = Object.keys(dayMap).sort();
+    var last = days.length - 1;
+    var today = new Date().toISOString().slice(0, 10);
+    var active = days[last] === today;
+    var streak = 1;
+    var thirtyMinStreak = dayMap[days[last]] >= 1800000 ? 1 : 0;
+    for (var i = last - 1; i >= 0; i--) {
+      var curr = new Date(days[i] + "T00:00:00Z");
+      var next = new Date(days[i + 1] + "T00:00:00Z");
+      var diff = Math.round((next.getTime() - curr.getTime()) / 86400000);
+      if (diff !== 1) break;
+      streak++;
+      if (dayMap[days[i]] >= 1800000) thirtyMinStreak++;
+    }
+
+    self.postMessage({ ok: true, lessons: lessons, keyStats: keyStats, streak: streak, thirtyMinStreak: thirtyMinStreak, active: active });
   } catch (err) {
     self.postMessage({ ok: false, error: err.message });
   }

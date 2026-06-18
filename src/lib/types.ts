@@ -79,3 +79,13 @@ export interface ParserResult {
   /** Total parse time in milliseconds */
   totalTime: number;
 }
+
+/** Consecutive-day streak data */
+export interface StreakResult {
+  /** Consecutive days with at least one lesson */
+  streak: number;
+  /** Consecutive days with at least 30 minutes of practice */
+  thirtyMinStreak: number;
+  /** Whether the most recent lesson day is today */
+  active: boolean;
+}

@@ -92,6 +92,7 @@ src/
 │   ├── KeyErrorChart.tsx    # Per-key error rate bar chart
 │   ├── RecentAverages.tsx   # Summary cards
 │   ├── RangeSelect.tsx      # Lesson range filter buttons
+│   ├── StreakCard.tsx        # Daily streak counters with flame icons
 │   └── ThemeToggle.tsx      # Light/dark mode toggle
 └── lib/
     ├── parser.ts            # JSON parsing, WPM/accuracy computation, linear regression
@@ -106,6 +107,13 @@ Built with [OpenCode](https://opencode.ai) using the **DeepSeek V4 Flash Free** 
 - Keybr data schema documented from real exports and the [keybr.com source](https://github.com/aradzie/keybr.com)
 - WPM formula reference from the [keybr-mwp-workspace project](https://github.com/alex-nyo/keybr-mwp-workspace)
 - Charts powered by [Recharts](https://recharts.org/)
+
+## Future Considerations
+
+- **Wide screen layout** — charts could span in a multi-column grid on large viewports instead of a single vertical stack
+- **Session-level breakdown** — group lessons by session (auto-detected by time gaps) for between-session comparisons
+- **Export comparison** — upload multiple exports and overlay trends
+- **PDF/Image export** — save charts as PNG or PDF
 
 ## License
 

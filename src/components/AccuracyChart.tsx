@@ -36,7 +36,8 @@ export function AccuracyChart({ lessons }: { lessons: ProcessedLesson[] }) {
     <div className="border border-beige-dark p-4 bg-beige-light dark:bg-[#3D3226] dark:border-[#5A4A3A]">
       <h2 className="text-lg font-semibold mb-1 text-warm-brown dark:text-beige">Accuracy Over Time</h2>
       {slopeLabel && <p className="text-sm text-warm-gray mb-3">{slopeLabel}</p>}
-      <ResponsiveContainer width="100%" height={300}>
+      <div className="h-[300px] lg:h-[400px]">
+        <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="#D4C9B4" />
           <XAxis dataKey="i" tick={false} label={{ value: "Lesson", position: "insideBottom", offset: -5, fill: "#8B7D6B" }} />
@@ -47,6 +48,7 @@ export function AccuracyChart({ lessons }: { lessons: ProcessedLesson[] }) {
           {trend && <Line type="monotone" dataKey="trend" stroke="#D97706" strokeWidth={2} strokeDasharray="6 3" dot={false} isAnimationActive={false} />}
         </LineChart>
       </ResponsiveContainer>
+      </div>
     </div>
   );
 }
