@@ -36,6 +36,7 @@ export function Dashboard() {
   const [parseTime, setParseTime] = useState(0);
   const [totalLessons, setTotalLessons] = useState(0);
   const [range, setRange] = useState<Range>("all");
+  const [fileKey, setFileKey] = useState(0);
   const workerRef = useRef<Worker | null>(null);
 
   // Clean up worker on unmount
@@ -45,6 +46,7 @@ export function Dashboard() {
 
   const handleFile = useCallback((file: File) => {
     setError(null);
+    setFileKey((k) => k + 1);
     setPhase("parsing");
     const reader = new FileReader();
     reader.onload = () => {
@@ -66,6 +68,12 @@ export function Dashboard() {
             setError(msg.error);
             setPhase("upload");
           }
+        };
+        worker.onerror = (e) => {
+          worker.terminate();
+          workerRef.current = null;
+          setError(`Worker crashed: ${e.message}`);
+          setPhase("upload");
         };
         worker.postMessage(raw);
       } else {
@@ -117,6 +125,7 @@ export function Dashboard() {
               <label className="cursor-pointer inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-medium text-white hover:bg-blue-700 transition-colors">
                 Choose export file
                 <input
+                  key={fileKey}
                   type="file"
                   accept=".json"
                   className="hidden"
@@ -150,6 +159,7 @@ export function Dashboard() {
           <label className="cursor-pointer text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400">
             Upload
             <input
+              key={fileKey}
               type="file"
               accept=".json"
               className="hidden"
