@@ -1,5 +1,7 @@
 # keybr Export Analyzer
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue?style=for-the-badge)](https://sirmastermind1379.github.io/keybr-export-analyzer/)
+
 A fully client-side web app that visualizes your [keybr.com](https://www.keybr.com) typing practice data. Upload your export JSON and get interactive WPM/accuracy charts, per-key breakdowns, trend analysis, and recent averages — all in your browser with no backend.
 
 ## Features
