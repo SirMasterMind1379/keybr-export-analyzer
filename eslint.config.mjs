@@ -11,6 +11,8 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    "release/**",
+    "keybr-analyzer-*.zip",
     "next-env.d.ts",
   ]),
 ]);

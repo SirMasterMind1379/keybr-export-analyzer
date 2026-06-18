@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.1.1 (2026-06-18) — Guide to Export & SSR Fixes
+
+### Added
+- "Guide to export" button on upload screen with 3-step instructions linking to keybr.com/profile
+
+### Fixed
+- ThemeToggle SSR crash: `document is not defined` during server-side rendering (reverted to useEffect with eslint-disable)
+- Removed unused `t1` variable in parser.ts
+- ESLint config now ignores `release/` and `.zip` build artifacts
+
 ## v1.1.0 (2026-06-18) — Theme Revamp & Documentation
 
 ### Added

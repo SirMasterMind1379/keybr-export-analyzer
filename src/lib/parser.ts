@@ -23,7 +23,6 @@ import type { KeybrLesson, ProcessedLesson, KeyStats, ParserResult } from "./typ
 export function parseLessons(raw: string): ParserResult {
   const t0 = performance.now();
   const data: KeybrLesson[] = JSON.parse(raw);
-  const t1 = performance.now();
 
   const len = data.length;
   const lessons = new Array<ProcessedLesson>(len);

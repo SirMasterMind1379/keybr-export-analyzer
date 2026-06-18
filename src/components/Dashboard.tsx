@@ -44,6 +44,7 @@ export function Dashboard() {
   const [totalLessons, setTotalLessons] = useState(0);
   const [range, setRange] = useState<Range>("all");
   const [fileKey, setFileKey] = useState(0);
+  const [showGuide, setShowGuide] = useState(false);
   const workerRef = useRef<Worker | null>(null);
 
   useEffect(() => {
@@ -144,6 +145,24 @@ export function Dashboard() {
                   }}
                 />
               </label>
+              <button
+                type="button"
+                onClick={() => setShowGuide((v) => !v)}
+                className="block mx-auto mt-4 text-sm text-royal-red hover:text-royal-red-dark underline underline-offset-2"
+              >
+                Guide to export
+              </button>
+              {showGuide && (
+                <div className="mt-4 p-4 border border-royal-red text-sm text-left text-warm-brown dark:text-beige space-y-2">
+                  <p>To export your keybr.com data:</p>
+                  <ol className="list-decimal pl-5 space-y-1">
+                    <li>Go to <a href="https://www.keybr.com/profile" target="_blank" rel="noopener noreferrer" className="underline text-royal-red">keybr.com/profile</a></li>
+                    <li>Scroll all the way down</li>
+                    <li>Press the <strong>Download Data</strong> button</li>
+                  </ol>
+                  <p className="text-warm-gray">Save the JSON file and upload it above.</p>
+                </div>
+              )}
               {error && <p className="mt-4 text-sm text-royal-red">{error}</p>}
             </>
           )}
