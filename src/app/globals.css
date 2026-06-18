@@ -1,0 +1,9 @@
+/* Tailwind v4 base — includes reset, utilities, and theme variables */
+@import "tailwindcss";
+
+/* Switch dark mode from media-query-based to class-based (.dark on <html>) */
+@variant dark (&:where(.dark, .dark *));
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
